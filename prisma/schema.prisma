@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("EXPO_PUBLIC_DATABASE_URL")
+}
+
+model Users {
+  id       String  @id() @default(uuid()) @db.Uuid()
+  name     String
+  email    String  @unique()
+  password String
+  isActive Boolean
+  role     Role    @default(USER)
+
+  image   Images? @relation(fields: [imageId], references: [id])
+  imageId String? @db.Uuid()
+
+  resetUserAccount ResetUserAccount[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@map("users")
+}
+
+model Images {
+  id       String @id() @default(uuid()) @db.Uuid()
+  filename String
+
+  item           Items?
+  customer       Customers?
+  user           Users[]
+  imagesInOrders ImagesInOrder[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("images")
+}
+
+model Addresses {
+  id            String @id() @default(uuid()) @db.Uuid()
+  address       String @db.VarChar(64)
+  numberAddress Int    @db.Integer()
+  zipcode       String @db.VarChar(9)
+  neighborhood  String @db.VarChar(64)
+  complement    String @db.VarChar(128)
+  city          String @db.VarChar(48)
+  provincy      String @db.VarChar(2)
+
+  customer Customers?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("addresses")
+}
+
+model DeliveredAddresses {
+  id               String  @id() @default(uuid()) @db.Uuid()
+  address          String  @db.VarChar(64)
+  numberAddress    Int     @db.Integer()
+  zipcode          String  @db.VarChar(9)
+  neighborhood     String  @db.VarChar(64)
+  complement       String  @db.VarChar(128)
+  city             String  @db.VarChar(48)
+  provincy         String  @db.VarChar(2)
+  isDefaultAddress Boolean @default(false)
+
+  Customers   Customers? @relation(fields: [customersId], references: [id])
+  customersId String?    @db.Uuid()
+
+  orders Orders[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("delivered_addresses")
+}
+
+model Items {
+  id            String  @id() @default(uuid()) @db.Uuid()
+  name          String
+  amountInCents Int
+  isActive      Boolean @default(true)
+
+  image   Images? @relation(fields: [imageId], references: [id])
+  imageId String? @unique() @db.Uuid()
+
+  itemsInOrders ItemsInOrder[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("items")
+}
+
+model Customers {
+  id    String @id() @default(uuid()) @db.Uuid()
+  name  String
+  cpf   String @unique() @db.VarChar(14)
+  phone String @db.VarChar(15)
+
+  image   Images? @relation(fields: [imageId], references: [id])
+  imageId String? @unique() @db.Uuid()
+
+  address   Addresses @relation(fields: [addressId], references: [id])
+  addressId String    @unique() @db.Uuid()
+
+  deliveredAddresses DeliveredAddresses[]
+
+  orders Orders[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("customers")
+}
+
+model ItemsInOrder {
+  id String @id() @default(uuid()) @db.Uuid()
+
+  item   Items  @relation(fields: [itemId], references: [id])
+  itemId String @db.Uuid()
+
+  order   Orders @relation(fields: [orderId], references: [id])
+  orderId String @db.Uuid()
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("items_in_order")
+}
+
+model ImagesInOrder {
+  id String @id() @default(uuid()) @db.Uuid()
+
+  image   Images @relation(fields: [imageId], references: [id])
+  imageId String @db.Uuid()
+
+  order   Orders @relation(fields: [orderId], references: [id])
+  orderId String @db.Uuid()
+
+  @@map("images_in_order")
+}
+
+model Orders {
+  id                 String   @id() @default(uuid()) @db.Uuid()
+  status             Status?  @default(PENDING)
+  totalAmountInCents Int
+  takenAt            DateTime
+  collectedAt        DateTime
+  isCollected        Boolean  @default(false)
+
+  itemsInOrders  ItemsInOrder[]
+  imagesInOrders ImagesInOrder[]
+
+  customer   Customers @relation(fields: [customerId], references: [id])
+  customerId String    @db.Uuid()
+
+  deliveryAddress   DeliveredAddresses @relation(fields: [deliveryAddressId], references: [id])
+  deliveryAddressId String             @db.Uuid()
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("orders")
+}
+
+model ResetUserAccount {
+  id        String  @id() @default(uuid()) @db.Uuid()
+  isReseted Boolean @default(false)
+  isValid   Boolean @default(true)
+
+  expiredAt DateTime
+
+  user   Users  @relation(fields: [userId], references: [id])
+  userId String @db.Uuid()
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("reset_user_account")
+}
+
+enum Role {
+  ADMINISTRATOR
+  USER
+}
+
+enum Status {
+  PENDING
+  PAID
+  CANCELED
+}
