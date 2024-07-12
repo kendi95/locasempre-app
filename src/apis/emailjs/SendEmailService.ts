@@ -1,6 +1,5 @@
 import axios from 'axios'
 
-import { env } from '@/env'
 import { AppError } from '@/errors/AppError'
 
 type InputData = {
@@ -16,9 +15,9 @@ type InputData = {
 export class SendEmailService {
   async execute(data: InputData) {
     try {
-      const response = await axios.post(env?.EXPO_PUBLIC_EMAILJS_URL!, {
+      const response = await axios.post(process.env.EXPO_PUBLIC_EMAILJS_URL!, {
         lib_version: '4.3.3',
-        user_id: env?.EXPO_PUBLIC_EMAILJS_PUBLIC_KEY!,
+        user_id: process.env.EXPO_PUBLIC_EMAILJS_PUBLIC_KEY!,
         service_id: 'service_gmail',
         template_id: 'template_resetpass',
         template_params: {

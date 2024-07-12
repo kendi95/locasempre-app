@@ -2,7 +2,7 @@
   "expo": {
     "name": "Loca Sempre",
     "slug": "locasempre-app",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "locasempreapp",
@@ -28,6 +28,7 @@
         "backgroundColor": "#18181b"
       },
       "package": "com.kohatsu.locasempreapp",
+      "versionCode": 1,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"

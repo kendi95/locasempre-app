@@ -90,9 +90,9 @@ export default function Home() {
     }
   }
 
-  // useEffect(() => {
-  //   checkAuthentication();
-  // }, [isFirstOpenApp])
+  useEffect(() => {
+    checkAuthentication();
+  }, [isFirstOpenApp])
 
   useEffect(() => {
     requestPermissionNotification()

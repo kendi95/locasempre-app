@@ -2,7 +2,6 @@ import 'react-native-gesture-handler';
 import "@/libs/uninstyles"
 
 import { StatusBar } from 'expo-status-bar';
-
 import { useStyles } from 'react-native-unistyles';
 import { Toasts } from '@backpackapp-io/react-native-toast';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -28,21 +27,22 @@ export default function Layout() {
     Inter_700Bold
   })
 
-  if (!fontLoaded) {
-    <AppLoading />
-  }
-
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <StatusBar backgroundColor={theme.colors.background} style="light" />
-
+     
       <QueryClientProvider client={queryClient}>
         <AppProvider>
-          <Router />
+          {!fontLoaded ? (
+            <AppLoading />
+          ) : (
+            <Router />
+          )}
 
           <Toasts />
         </AppProvider>
       </QueryClientProvider>
+
     </GestureHandlerRootView>
   )
 }

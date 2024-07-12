@@ -2,7 +2,6 @@ import bcrypt from 'bcrypt-react-native'
 import { sign } from 'react-native-pure-jwt'
 import SecureStorage, { ACCESSIBLE } from 'rn-secure-storage'
 
-import { env } from '@/env'
 import { Role } from '@prisma/client'
 import { supabase } from "@/database"
 import { AppError } from '@/errors/AppError'
@@ -54,7 +53,7 @@ export class AuthenticationService {
         role: findedEmail.data.role,
         expiration: new Date().getTime() + (minut * 5) // 5 minuts
       }, 
-      String(env?.EXPO_PUBLIC_SECRET_KEY), 
+      String(process.env.EXPO_PUBLIC_SECRET_KEY!), 
       { alg: 'HS256' }
     )
 

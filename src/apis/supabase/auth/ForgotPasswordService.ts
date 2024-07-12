@@ -48,7 +48,9 @@ export class ForgotPasswordService {
       await sendEmailService.execute({
         to_name: user.data?.name!,
         to_email: user.data?.email!,
-        message: resetUserAccountId
+        message: resetUserAccountId,
+        service_id: 'service_gmail',
+        template_id: 'template_resetpass'
       })
     } catch (error) {
       throw error

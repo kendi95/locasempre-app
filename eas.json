@@ -11,10 +11,19 @@
       "distribution": "internal",
       "channel": "preview",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "autoIncrement": "version"
       },
       "cache": {
         "disabled": false
+      },
+      "env": {
+        "EXPO_PUBLIC_DATABASE_URL": "",
+        "EXPO_PUBLIC_SUPABASE_URL": "",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "",
+        "EXPO_PUBLIC_SECRET_KEY": "",
+        "EXPO_PUBLIC_EMAILJS_URL": "",
+        "EXPO_PUBLIC_EMAILJS_PUBLIC_KEY": ""
       }
     },
     "production": {}

@@ -13,9 +13,9 @@ type DataEnv = z.infer<typeof envSchema>
 
 let env: DataEnv | null
 
-async function validationEnv() {
+function validationEnv() {
   try {
-    env = await envSchema.parseAsync(process.env)
+    env = envSchema.parse(process.env)
   } catch (err) {
     env = null
     throw new Error('Deve conter variáveis de ambiente dentro do arquivo .env')
