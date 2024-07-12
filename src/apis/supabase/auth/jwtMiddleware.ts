@@ -20,41 +20,41 @@ export const EXPO_SECURE = "SECURE_TOKEN"
 
 export async function jwtMiddleware(token?: string): Promise<ReturnData> {
   try {
-    if (token) {
-      const { payload } = await decode(token, String(env?.EXPO_PUBLIC_SECRET_KEY))
-      const { expiration, user_id } = payload as Payload
+    // if (token) {
+    //   const { payload } = await decode(token, String(env?.EXPO_PUBLIC_SECRET_KEY))
+    //   const { expiration, user_id } = payload as Payload
     
-      if (expiration > new Date().getTime()) {
-        await SecureStorage.setItem(EXPO_SECURE, token, { accessible: ACCESSIBLE.ALWAYS })
+    //   if (expiration > new Date().getTime()) {
+    //     await SecureStorage.setItem(EXPO_SECURE, token, { accessible: ACCESSIBLE.ALWAYS })
     
-        return { user_id, status: true }
-      }
+    //     return { user_id, status: true }
+    //   }
     
-      await SecureStorage.removeItem(EXPO_SECURE)
+    //   await SecureStorage.removeItem(EXPO_SECURE)
     
-      return { status: false }
-    }
+    //   return { status: false }
+    // }
 
-    const isExists = await SecureStorage.exist(EXPO_SECURE)
+    // const isExists = await SecureStorage.exist(EXPO_SECURE)
   
-    if (!isExists) {
-      await SecureStorage.setItem(EXPO_SECURE, '', { accessible: ACCESSIBLE.ALWAYS })
-    }
+    // if (!isExists) {
+    //   await SecureStorage.setItem(EXPO_SECURE, '', { accessible: ACCESSIBLE.ALWAYS })
+    // }
   
-    const securedToken = await SecureStorage.getItem(EXPO_SECURE)
+    // const securedToken = await SecureStorage.getItem(EXPO_SECURE)
   
-    if (securedToken) {
-      const { payload } = await decode(securedToken, String(env?.EXPO_PUBLIC_SECRET_KEY))
-      const { expiration, user_id, role } = payload as Payload
+    // if (securedToken) {
+    //   const { payload } = await decode(securedToken, String(env?.EXPO_PUBLIC_SECRET_KEY))
+    //   const { expiration, user_id, role } = payload as Payload
     
-      if (expiration > new Date().getTime()) {
-        return { user_id, role, status: true }
-      }
+    //   if (expiration > new Date().getTime()) {
+    //     return { user_id, role, status: true }
+    //   }
   
-      await SecureStorage.removeItem(EXPO_SECURE)
+    //   await SecureStorage.removeItem(EXPO_SECURE)
   
-      return { status: false }
-    }
+    //   return { status: false }
+    // }
   
     return { status: false }
   } catch (error) {

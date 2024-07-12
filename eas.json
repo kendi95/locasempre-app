@@ -12,6 +12,9 @@
       "channel": "preview",
       "android": {
         "buildType": "apk"
+      },
+      "cache": {
+        "disabled": false
       }
     },
     "production": {}
