@@ -27,7 +27,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#18181b"
       },
-      "package": "com.kohatsu.locasempreapp"
+      "package": "com.kohatsu.locasempreapp",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -46,6 +50,19 @@
           "color": "#166534"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "0d2508a4-96f3-4ece-8ed1-6c57bee031c9"
+      }
+    },
+    "owner": "kendi",
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/0d2508a4-96f3-4ece-8ed1-6c57bee031c9"
+    }
   }
 }

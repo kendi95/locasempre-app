@@ -1,3 +1,4 @@
+import { StatusBar } from "expo-status-bar"
 import { ActivityIndicator, View } from "react-native"
 import { createStyleSheet, useStyles } from "react-native-unistyles"
 
@@ -6,6 +7,8 @@ export function AppLoading() {
 
   return (
     <View style={styles.container}>
+      <StatusBar backgroundColor={theme.colors.background} style="light" />
+
       <ActivityIndicator size="large" color={theme.colors.primary} />
     </View>
   )

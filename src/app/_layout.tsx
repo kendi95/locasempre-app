@@ -9,7 +9,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 
-import { env } from '@/env'
 import { AppProvider } from '@/context/AppProvider';
 import { initNotifications } from '@/libs/notifications';
 
@@ -29,17 +28,17 @@ export default function Layout() {
     Inter_700Bold
   })
 
+  if (!fontLoaded) {
+    <AppLoading />
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <StatusBar backgroundColor={theme.colors.background} style="light" />
 
       <QueryClientProvider client={queryClient}>
         <AppProvider>
-          {!fontLoaded || !env ? (
-            <AppLoading />
-          ) : (
-            <Router />
-          )}
+          <Router />
 
           <Toasts />
         </AppProvider>
