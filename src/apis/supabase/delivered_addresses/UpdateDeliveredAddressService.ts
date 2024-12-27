@@ -13,11 +13,11 @@ type InputData = {
 }
 
 export class UpdateDeliveredAddressService {
-  async execute(customer_id: string, data: InputData) {
+  async execute(address_id: string, data: InputData) {
     try {
       const { data: dataAddress } = await supabase.from('delivered_addresses')
         .select('id')
-        .eq('customersId', customer_id)
+        .eq('id', address_id)
         .single()
 
       if (!dataAddress) {
@@ -28,7 +28,7 @@ export class UpdateDeliveredAddressService {
         .update({
           ...data,
           updatedAt: dayjs().toISOString()
-        }).eq('customersId', customer_id)
+        }).eq('id', address_id)
 
       if (errorAddress) {
         throw new Error(errorAddress.message)

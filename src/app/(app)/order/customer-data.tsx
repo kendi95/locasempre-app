@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { useStyles } from "react-native-unistyles";
 import { useEffect, useMemo, useState } from "react";
 import { Control, Controller } from "react-hook-form";
@@ -9,6 +9,8 @@ import { ChooseItem } from "@/components/ChooseItem";
 
 import { FormData } from "./create-order";
 
+import { useToast } from "@/hooks/useToast";
+import { queryClient } from "@/libs/use-query";
 import { ListCustomersService } from "@/apis/supabase/customers/ListCustomersService";
 import { UpdateDefaultAddressDeliveredAddressService } from "@/apis/supabase/delivered_addresses/UpdateDefaultAddressDeliveredAddressService";
 import { DeliveredAddresses, GetDeliveredAddressesByCustomerService } from "@/apis/supabase/delivered_addresses/GetDeliveredAddressesByCustomerService";
@@ -32,6 +34,7 @@ type CustomerDataProps = {
 
 export function CustomerData({ control, customerId, onCreateNewDeliveredAddress, onCreateNewCustomer, onSelectedDeliveredddress }: CustomerDataProps) {
   const { theme } = useStyles()
+  const { error } = useToast()
   const [search, setSearch] = useState('')
 
   const { data, refetch } = useQuery({
@@ -43,7 +46,31 @@ export function CustomerData({ control, customerId, onCreateNewDeliveredAddress,
   const { isFetching, data: dataDeliveredAddresses, refetch: refetchDeliveredAddress } = useQuery({
     queryKey: ['order-customer-delivered-address', customerId],
     queryFn: fetchDeliveredAddressByCustomer,
-    enabled: false
+    enabled: false,
+  })
+
+  const { mutate } = useMutation({
+    mutationKey: ['order-customer-delivered-address'],
+    mutationFn: handleUpdateDefaultDeliveredAddress,
+    onSuccess: (address_id: string) => {
+      const cachedData: DeliveredAddresses[] = queryClient.getQueryData(['order-customer-delivered-address', customerId])
+
+      queryClient.setQueryData(['order-customer-delivered-address', customerId], () => {
+        return cachedData.map((address) => {
+          if (address.id === address_id) {
+            return {
+              ...address,
+              isDefaultAddress: true
+            }
+          }
+
+          return {
+            ...address,
+            isDefaultAddress: false
+          }
+        })
+      })
+    }
   })
 
   const customers = useMemo(() => {
@@ -103,22 +130,13 @@ export function CustomerData({ control, customerId, onCreateNewDeliveredAddress,
   async function handleUpdateDefaultDeliveredAddress(deliveredAddressId: string) {
     try {
       await updateDefaultAddress.execute(deliveredAddressId, { customerId })
-
-      setDeliveredAddresses(oldAddress => {
-        return oldAddress.map((address) => {
-          if (address.id === deliveredAddressId) {
-            onSelectedDeliveredddress(address)
-            return {
-              ...address,
-              isDefaultAddress: true
-            }
-          }
-
-          return address
-        })
+      return deliveredAddressId
+    } catch (err: any) {
+      error({
+        message: err?.message,
+        duration: 4000,
+        position: 2
       })
-    } catch (error) {
-      
     }
   }
 
@@ -169,7 +187,7 @@ export function CustomerData({ control, customerId, onCreateNewDeliveredAddress,
                 key={address.id}
                 isSelected={address.isDefaultAddress}
                 label={`${address.address}, ${address.numberAddress} - ${address.city}/${address.provincy}`} 
-                onPress={() => handleUpdateDefaultDeliveredAddress(address.id)} 
+                onPress={() => mutate(address.id)} 
               />
             ))}
           </View>

@@ -75,7 +75,7 @@ export default function CreateItem() {
       })
 
       goBack()
-    } catch (err) {
+    } catch (err: any) {
       error({
         message: err.message,
         duration: 4000,

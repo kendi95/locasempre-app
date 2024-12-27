@@ -18,12 +18,12 @@
         "disabled": false
       },
       "env": {
-        "EXPO_PUBLIC_DATABASE_URL": "",
-        "EXPO_PUBLIC_SUPABASE_URL": "",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "",
-        "EXPO_PUBLIC_SECRET_KEY": "",
-        "EXPO_PUBLIC_EMAILJS_URL": "",
-        "EXPO_PUBLIC_EMAILJS_PUBLIC_KEY": ""
+        "EXPO_PUBLIC_DATABASE_URL": "postgres://postgres.pycicyylxkriijonazag:vT1dAQJDImBqbRTi@aws-0-sa-east-1.pooler.supabase.com:5432/postgres",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://pycicyylxkriijonazag.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5Y2ljeXlseGtyaWlqb25hemFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNjI2OTEsImV4cCI6MjAyODkzODY5MX0.HK2bGCRKBXQZHQ_b9cKRw9TjfUz-4T-CmXdwISJj-es",
+        "EXPO_PUBLIC_SECRET_KEY": "036f7113833f82df6571a17e6d40cbd82f55f247",
+        "EXPO_PUBLIC_EMAILJS_URL": "https://api.emailjs.com/api/v1.0/email/send",
+        "EXPO_PUBLIC_EMAILJS_PUBLIC_KEY": "MqEZcVSWkyVz3Uwiw"
       }
     },
     "production": {}

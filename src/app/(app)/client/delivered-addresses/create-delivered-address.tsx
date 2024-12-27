@@ -118,7 +118,7 @@ export default function CreateDeliveredAddress() {
         alignItems: 'flex-start',
         paddingTop: 48,
         paddingBottom: 8,
-        paddingHorizontal: 24,
+        paddingHorizontal: 32,
         width: '100%'
       }}
     >
@@ -128,11 +128,7 @@ export default function CreateDeliveredAddress() {
       </View>
 
       <Form style={{ flex: 1 }}>
-        <ScrollView 
-          showsVerticalScrollIndicator={false} 
-          style={{ backgroundColor: theme.colors.background }}
-          contentContainerStyle={{ gap: 8, paddingHorizontal: 8, backgroundColor: theme.colors.background }}
-        >
+        <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%' }} contentContainerStyle={{ gap: 8, flex: 1 }}>
           <View style={styles.horizontal}>
             <Input.Container label="CEP" style={{ width: '68%' }}>
               <Controller 
@@ -267,7 +263,7 @@ export default function CreateDeliveredAddress() {
             disabled={isSubmitting}
             loading={isSubmitting}
             onPress={handleSubmit(handleCreateDeliveredAddress)} 
-            style={{ marginTop: 32 }} 
+            style={{ position: 'absolute', bottom: 16 }} 
           />
         </ScrollView>
       </Form>

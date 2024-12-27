@@ -23,8 +23,8 @@ import { useToast } from "@/hooks/useToast";
 import { amountFormat } from "@/utils/amountFormat";
 import { currencyFormat } from "@/utils/currencyFormat";
 import { GetItemService } from "@/apis/supabase/items/GetItemService";
-import { UpdateItemService } from "@/apis/supabase/items/UpdateItemService";
 import { GetFileService } from "@/apis/supabase/files/GetFileService";
+import { UpdateItemService } from "@/apis/supabase/items/UpdateItemService";
 
 const service = new GetItemService()
 const updateService = new UpdateItemService()
@@ -34,7 +34,7 @@ const schemaData = z.object({
   name: z.string({ message: 'Nome obrigatório.' }),
   amount: z.string({ message: 'Preço obrigatório.' }),
   isActive: z.boolean().default(true),
-  imageURL: z.string()
+  imageURL: z.string().optional()
 })
 
 type FormData = z.infer<typeof schemaData>
@@ -50,7 +50,14 @@ export default function UpdateItem() {
   const [showCamera, setShowCamera] = useState(false)
   const [file, setFile] = useState<CameraCapturedPicture | undefined>(undefined)
 
-  const { control, handleSubmit, setValue, reset, watch, formState: { isSubmitting, errors } } = useForm<FormData>({
+  const { 
+    control, 
+    handleSubmit, 
+    setValue, 
+    reset, 
+    watch, 
+    formState: { isSubmitting, errors } 
+  } = useForm<FormData>({
     resolver: zodResolver(schemaData)
   })
 
@@ -61,8 +68,6 @@ export default function UpdateItem() {
 
   async function handleUpdateItem(data: FormData) {
     try {
-      await schemaData.parseAsync(data)
-
       await updateService.execute(String(item_id), {
         name: data.name,
         isActive: data.isActive,
@@ -83,7 +88,7 @@ export default function UpdateItem() {
       })
 
       goBack()
-    } catch (err) {
+    } catch (err: any) {
       error({
         message: err?.message,
         duration: 4000,
@@ -123,7 +128,7 @@ export default function UpdateItem() {
         duration: 5000,
         position: 2
       })
-    } catch (err) {
+    } catch (err: any) {
       error({
         message: err.message,
         duration: 5000,
@@ -250,6 +255,8 @@ export default function UpdateItem() {
                         <Input.ImageCard size="xl" source={{ uri: watch('imageURL') }} />
                       ) : watch('imageURL') !== undefined && file?.uri !== undefined ? (
                         <Input.ImageCard size="xl" source={{ uri: file?.uri }} />
+                      ) : file !== undefined ? (
+                        <Input.ImageCard size="xl" source={{ uri: file?.uri }} />
                       ) : <></>}
                     </View>
                   </Input.Container>
@@ -264,6 +271,7 @@ export default function UpdateItem() {
                     disabled={isSubmitting}
                     loading={isSubmitting} 
                     onPress={handleSubmit(handleUpdateItem)} 
+                    // onPress={() => console.log("passou")}
                     style={{ position: 'absolute', bottom: 16 }} 
                   />
                 </ScrollView>

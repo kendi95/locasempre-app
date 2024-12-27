@@ -3,19 +3,18 @@ import "@/libs/uninstyles"
 
 import { StatusBar } from 'expo-status-bar';
 import { useStyles } from 'react-native-unistyles';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Toasts } from '@backpackapp-io/react-native-toast';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 
+import { queryClient } from '@/libs/use-query';
 import { AppProvider } from '@/context/AppProvider';
 import { initNotifications } from '@/libs/notifications';
 
 import { Router } from './router';
 
 import { AppLoading } from '@/components/AppLoading';
-
-const queryClient = new QueryClient()
 
 initNotifications();
 

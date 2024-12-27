@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { createStyleSheet, useStyles } from "react-native-unistyles";
 import { ActivityIndicator, FlatList, View, RefreshControl } from "react-native";
@@ -12,6 +12,7 @@ import { FloatingActionButton } from "@/components/FloatingActionButton";
 
 import { useApp } from "@/hooks/useApp";
 import { GetDeliveredAddressesByCustomerService } from "@/apis/supabase/delivered_addresses/GetDeliveredAddressesByCustomerService";
+import { useFocusEffect } from "@react-navigation/native";
 
 const getDeliveredAddressService = new GetDeliveredAddressesByCustomerService()
 
@@ -30,12 +31,12 @@ export default function DeliveredAddresses() {
   const [addresses, setAddresses] = useState<DeliveredAddressItem[]>([])
 
   function handleUpdateAddress(address_id: string) {
-    navigate('delivered-addresses/update-delivered-address' as never)
-    setParams({ customer_id: String(customer_id) })
+    navigate('/client/delivered-addresses/update-delivered-address' as never)
+    setParams({ address_id: String(address_id) })
   }
 
   function handleCreateDeliveredAddress() {
-    navigate('delivered-addresses/create-delivered-address' as never)
+    navigate('/client/delivered-addresses/create-delivered-address' as never)
     setParams({ customer_id: String(customer_id) })
   }
 
@@ -65,11 +66,15 @@ export default function DeliveredAddresses() {
     handleSwipeDrawer(false)
   }, [])
 
-  useEffect(() => {
-    if (customer_id) {
-      handleFetchDeliveredAddress()
-    }
-  }, [customer_id])
+  // useEffect(() => {
+  //   if (customer_id) {
+  //     handleFetchDeliveredAddress()
+  //   }
+  // }, [customer_id])
+
+  useFocusEffect(useCallback(() => {
+    handleFetchDeliveredAddress()
+  }, [customer_id]))
 
   return (
     <Container

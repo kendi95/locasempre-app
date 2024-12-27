@@ -1,11 +1,12 @@
 import { custom, z } from "zod";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useStyles } from "react-native-unistyles";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createStyleSheet } from "react-native-unistyles";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 
 import { Form } from "@/components/Form";
 import { Input } from "@/components/Input";
@@ -17,7 +18,7 @@ import { DrawerMenu } from "@/components/DrawerMenu";
 import { useApp } from "@/hooks/useApp";
 import { useToast } from "@/hooks/useToast";
 import { fetchCEP } from "@/apis/brasilapi/fetchCEP";
-import { GetDeliveredAddressByCustomerService } from "@/apis/supabase/delivered_addresses/GetDeliveredAddressByCustomerService";
+import { GetDeliveredAddressService } from "@/apis/supabase/delivered_addresses/GetDeliveredAddressService";
 import { UpdateDeliveredAddressService } from "@/apis/supabase/delivered_addresses/UpdateDeliveredAddressService";
 
 const schemaData = z.object({
@@ -36,48 +37,58 @@ const schemaData = z.object({
 
 type FormData = z.infer<typeof schemaData>
 
-const service = new GetDeliveredAddressByCustomerService()
+const service = new GetDeliveredAddressService()
 const updateService = new UpdateDeliveredAddressService()
 
 export default function UpdateDeliveredAddress() {
   const { goBack } = useNavigation()
-  const { success, error } = useToast()
+  const { success, error, normal } = useToast()
   const { handleSwipeDrawer } = useApp()
   const { styles, theme } = useStyles(style)
-  const { customer_id } = useLocalSearchParams()
-  const [loadData, setLoadData] = useState(false)
-  const [loadZipCode, setLoadZipCode] = useState(false)
+  const { address_id } = useLocalSearchParams()
 
   const { handleSubmit, control, formState: { isSubmitting }, setValue, getValues, reset } = useForm<FormData>({
     resolver: zodResolver(schemaData)
   })
 
+  const { isPending, mutate } = useMutation({
+    mutationKey: ['update-delivered-address', address_id],
+    mutationFn: handleFetchDeliveredAddress
+  })
+
+  const { mutate: mutateAddress, isPending: isPendingAddress } = useMutation({
+    mutationKey: ['update-customer-delivered-address'],
+    mutationFn: handleFetchCEP
+  })
+
   async function handleFetchDeliveredAddress() {
     try {
-      setLoadData(true)
+      const data = await service.execute({ address_id: String(address_id) })
 
-      const data = await service.execute({ customer_id: String(customer_id) })
+      setValue('address', data?.address ?? '')
+      setValue('city', data?.city ?? '')
+      setValue('complement', data?.complement ?? '')
+      setValue('neighborhood', data?.neighborhood ?? '')
+      setValue('numberAddress', String(data?.numberAddress ?? '0'))
+      setValue('provincy', data?.provincy ?? '')
+      setValue('zipcode', data?.zipcode ?? '')
 
-      reset({
-        address: data?.address,
-        city: data?.city,
-        complement: data?.complement,
-        neighborhood: data?.neighborhood,
-        numberAddress: String(data?.numberAddress || '0'),
-        provincy: data?.provincy,
-        zipcode: data?.zipcode
+      normal({
+        message: 'Dados carregados com sucesso.',
+        duration: 2000,
+        position: 2
       })
-    } catch (error) {
-      
-    } finally {
-      setLoadData(false)
+    } catch (err) {
+      error({
+        message: err?.message,
+        duration: 4000,
+        position: 2
+      })
     }
   }
 
   async function handleFetchCEP() {
     try {
-      setLoadZipCode(true)
-
       const { zipcode } = getValues()
       const response = await fetchCEP(zipcode);
 
@@ -91,16 +102,14 @@ export default function UpdateDeliveredAddress() {
         duration: 4000,
         position: 2
       })
-    } finally {
-      setLoadZipCode(false)
-    }
+    } 
   }
 
   async function handleUpdateDeliveredAddress(data: FormData) {
     try {
       await schemaData.parseAsync(data)
 
-      await updateService.execute(String(customer_id), {
+      await updateService.execute(String(address_id), {
         ...data,
         numberAddress: Number(data.numberAddress)
       })
@@ -137,10 +146,10 @@ export default function UpdateDeliveredAddress() {
   }, [])
 
   useEffect(() => {
-    if (customer_id) {
-      handleFetchDeliveredAddress()
+    if (address_id) {
+      mutate()
     }
-  }, [customer_id])
+  }, [address_id])
 
   return (
     <Container
@@ -148,7 +157,7 @@ export default function UpdateDeliveredAddress() {
         alignItems: 'flex-start',
         paddingTop: 48,
         paddingBottom: 8,
-        paddingHorizontal: 24,
+        paddingHorizontal: 32,
         width: '100%'
       }}
     >
@@ -157,18 +166,13 @@ export default function UpdateDeliveredAddress() {
         <Title label="Atualização de endereço" size="lg" style={{ textAlign: 'left' }} />
       </View>
 
-      {loadData ? (
+      {isPending ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', width: '100%' }}>
           <ActivityIndicator color={theme.colors.title} size="large" />
         </View>
       ) : (
-
         <Form style={{ flex: 1 }}>
-          <ScrollView 
-            showsVerticalScrollIndicator={false} 
-            style={{ backgroundColor: theme.colors.background }}
-            contentContainerStyle={{ gap: 8, paddingHorizontal: 8, backgroundColor: theme.colors.background }}
-          >
+          <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%' }} contentContainerStyle={{ gap: 8, flex: 1 }}>
             <View style={styles.horizontal}>
               <Input.Container label="CEP" style={{ width: '68%' }}>
                 <Controller 
@@ -181,10 +185,10 @@ export default function UpdateDeliveredAddress() {
                       mask={[/\d/, /\d/, /\d/,  /\d/,  /\d/, '-', /\d/, /\d/, /\d/]}
                       returnKeyType="search"
                       editable
-                      loading={loadZipCode}
+                      loading={isPendingAddress}
                       value={value}
                       onChangeText={(masked) => onChange(masked)}
-                      onEndEditing={handleFetchCEP}
+                      onEndEditing={() => mutateAddress()}
                       onBlur={onBlur}
                     />
                   )}
@@ -303,7 +307,7 @@ export default function UpdateDeliveredAddress() {
               disabled={isSubmitting}
               loading={isSubmitting}
               onPress={handleSubmit(handleUpdateDeliveredAddress)} 
-              style={{ marginTop: 32 }} 
+              style={{ position: 'absolute', bottom: 16 }} 
             />
           </ScrollView>
         </Form>

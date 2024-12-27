@@ -22,7 +22,7 @@ const service = new ListItemsService()
 export default function Items() {
   const { styles, theme } = useStyles(style)
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState('50')
+  const [limit, setLimit] = useState('10')
   const [search, setSearch] = useState('')
   const { navigate, setParams, replace } = useRouter()
   const [message, setMessage] = useState('')
